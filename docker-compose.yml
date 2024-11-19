@@ -1,0 +1,6 @@
+services:
+  angular-app:
+    image: web-pwa:latest
+    ports:
+      - "80:80"
+    restart: always

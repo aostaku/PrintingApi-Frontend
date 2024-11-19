@@ -1,0 +1,13 @@
+.container {
+  margin: 0 400px;
+  display: flex;
+  gap: 20px;
+}
+
+::ng-deep {
+  .p-card {
+    height: 300px;
+    width: 230px;
+    border-radius: 8px;
+  }
+}

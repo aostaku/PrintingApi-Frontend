@@ -1,0 +1,150 @@
+<p-dialog
+  header="Print Receipt"
+  [modal]="true"
+  [visible]="visible()"
+  [closable]="false"
+  clos
+  [style]="{ width: '35rem' }"
+>
+  <p-messages [(value)]="messages" [closable]="true"></p-messages>
+  <form [formGroup]="receiptForm" (ngSubmit)="onSubmit()">
+    <span class="p-text-secondary block mb-5"
+      >Fill up the invoice information.</span
+    >
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="company" class="font-semibold w-6rem">Company</label>
+      <input
+        pInputText
+        id="company"
+        formControlName="company"
+        class="flex-auto"
+        autocomplete="off"
+        [pTooltip]="getErrorMessage('company')"
+        tooltipPosition="right"
+        [tooltipDisabled]="
+          !receiptForm.get('company')?.invalid ||
+          !receiptForm.get('company')?.touched
+        "
+      />
+    </div>
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="streetAddress" class="font-semibold w-6rem"
+        >Street Address</label
+      >
+      <input
+        pInputText
+        id="streetAddress"
+        formControlName="streetAddress"
+        class="flex-auto"
+        autocomplete="off"
+        [pTooltip]="getErrorMessage('streetAddress')"
+        tooltipPosition="right"
+        [tooltipDisabled]="
+          !receiptForm.get('streetAddress')?.invalid ||
+          !receiptForm.get('streetAddress')?.touched
+        "
+      />
+    </div>
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="cityZipCode" class="font-semibold w-6rem"
+        >City/Zip Code</label
+      >
+      <input
+        pInputText
+        id="cityZipCode"
+        formControlName="cityZipCode"
+        class="flex-auto"
+        autocomplete="off"
+        [pTooltip]="getErrorMessage('cityZipCode')"
+        tooltipPosition="right"
+        [tooltipDisabled]="
+          !receiptForm.get('cityZipCode')?.invalid ||
+          !receiptForm.get('cityZipCode')?.touched
+        "
+      />
+    </div>
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="website" class="font-semibold w-6rem">Website</label>
+      <input
+        pInputText
+        id="website"
+        formControlName="website"
+        class="flex-auto"
+        autocomplete="off"
+        [pTooltip]="getErrorMessage('website')"
+        tooltipPosition="right"
+        [tooltipDisabled]="
+          !receiptForm.get('website')?.invalid ||
+          !receiptForm.get('website')?.touched
+        "
+      />
+    </div>
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="dateTime" class="font-semibold w-6rem">Date/Time</label>
+      <p-calendar
+        id="dateTime"
+        formControlName="dateTime"
+        class="flex-auto"
+        [pTooltip]="getErrorMessage('dateTime')"
+        tooltipPosition="right"
+        [tooltipDisabled]="
+          !receiptForm.get('dateTime')?.invalid ||
+          !receiptForm.get('dateTime')?.touched
+        "
+      />
+    </div>
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="productName" class="font-semibold w-6rem">Product Name</label>
+      <input
+        pInputText
+        id="productName"
+        formControlName="productName"
+        class="flex-auto"
+        autocomplete="off"
+        [pTooltip]="getErrorMessage('productName')"
+        tooltipPosition="right"
+        [tooltipDisabled]="
+          !receiptForm.get('productName')?.invalid ||
+          !receiptForm.get('productName')?.touched
+        "
+      />
+    </div>
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="price" class="font-semibold w-6rem">Price</label>
+      <input
+        pInputText
+        id="price"
+        formControlName="price"
+        class="flex-auto"
+        autocomplete="off"
+        [pTooltip]="getErrorMessage('productName')"
+        tooltipPosition="right"
+        [tooltipDisabled]="
+          !receiptForm.get('productName')?.invalid ||
+          !receiptForm.get('productName')?.touched
+        "
+      />
+    </div>
+    <div class="flex justify-content-end gap-2 mb-3">
+      <p-button
+        label="Fill with Mock Data"
+        severity="info"
+        (onClick)="fillWithMockData()"
+      />
+    </div>
+    <div class="flex justify-content-end gap-2">
+      <p-button label="Cancel" severity="secondary" (onClick)="close()" />
+      <div
+        [pTooltip]="receiptForm.invalid ? 'Form needs to be valid' : ''"
+        tooltipPosition="top"
+      >
+        <p-button
+          label="Print"
+          type="submit"
+          [disabled]="receiptForm.invalid"
+          tooltipPosition="top"
+        />
+      </div>
+    </div>
+  </form>
+</p-dialog>
