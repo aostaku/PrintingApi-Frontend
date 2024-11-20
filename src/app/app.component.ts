@@ -57,13 +57,16 @@ export class AppComponent {
   pageSize = 10;
 
   constructor() {
-    this.store.dispatch(
-      getReceipt({ pageIndex: this.pageIndex, pageSize: this.pageSize })
-    );
     if (this.status === 'ONLINE') {
-      // this.getData();
+      console.log('Online data was triggered');
+
+      this.store.dispatch(
+        getReceipt({ pageIndex: this.pageIndex, pageSize: this.pageSize })
+      );
     } else if (this.status === 'OFFLINE') {
-      this.getOfflineData();
+      console.log('Offline data was triggered');
+
+      this.store.dispatch(getReceiptOffline({ pageIndex: 1, pageSize: 10 }));
     }
     effect(() => {
       console.log('Status:', this.status);
@@ -94,10 +97,6 @@ export class AppComponent {
         .subscribe()
     );
   }
-
-  getOfflineData = () => {
-    this.store.dispatch(getReceiptOffline({ pageIndex: 1, pageSize: 10 }));
-  };
 
   printReceipt(receiptId: string) {
     this.store.dispatch(printReceiptById({ id: receiptId }));
