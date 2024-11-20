@@ -14,6 +14,20 @@ export const getReceiptFailure = createAction(
   props<{ error: any }>()
 );
 
+export const getReceiptOffline = createAction(
+  '[Receipt] Get Receipt Offline',
+  props<{ pageIndex: number; pageSize: number }>()
+);
+export const getReceiptOfflineSuccess = createAction(
+  '[Receipt] Get Receipt Offline Success',
+  props<{ receipt: Receipt[] }>()
+);
+
+export const getReceiptOfflineFailure = createAction(
+  '[Receipt] Get Receipt Offline Failure',
+  props<{ error: any }>()
+);
+
 export const printReceipt = createAction(
   '[Receipt] Print Receipt',
   props<{ receipt: Receipt }>()

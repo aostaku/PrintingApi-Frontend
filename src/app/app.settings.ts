@@ -6,4 +6,5 @@ export const AppSettings = {
   appVersion: '1.0.0',
   appDescription: 'A Progressive Web App prototype for a Smart POS system.',
   localServerUrl: env.localServerUrl ?? 'http://localhost:5236',
+  offlineServerUrl: 'localhost:44316',
 };

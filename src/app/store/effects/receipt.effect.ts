@@ -9,6 +9,9 @@ import { Receipt } from '../../models/receiptDTO';
 import {
   getReceipt,
   getReceiptFailure,
+  getReceiptOffline,
+  getReceiptOfflineFailure,
+  getReceiptOfflineSuccess,
   getReceiptSuccess,
   printReceipt,
   printReceiptById,
@@ -24,6 +27,7 @@ import {
 export class ReceiptEffects {
   constructor(private actions$: Actions, private http: HttpClient) {}
   private apiUrl = AppSettings.localServerUrl;
+  private offlineUrl = AppSettings.offlineServerUrl;
 
   getAllReceipts$ = createEffect(() =>
     this.actions$.pipe(
@@ -41,6 +45,27 @@ export class ReceiptEffects {
               getReceiptSuccess({ receipt: receipt.data })
             ),
             catchError((error) => of(getReceiptFailure({ error })))
+          )
+      )
+    )
+  );
+
+  getAllReceiptsOffline$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(getReceiptOffline),
+      mergeMap((action) =>
+        this.http
+          .get<PageableCollection<Receipt>>(`${this.offlineUrl}/api/invoice`, {
+            params: {
+              pageIndex: action.pageIndex.toString(),
+              pageSize: action.pageSize.toString(),
+            },
+          })
+          .pipe(
+            map((receipt: PageableCollection<Receipt>) =>
+              getReceiptOfflineSuccess({ receipt: receipt.data })
+            ),
+            catchError((error) => of(getReceiptOfflineFailure({ error })))
           )
       )
     )

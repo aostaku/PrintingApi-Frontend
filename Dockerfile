@@ -1,29 +1,36 @@
-# Use the official Node.js image to build the application
-FROM node:20 AS build
+# Stage 1: Build the application
+FROM node:latest AS build-stage
 
 # Set the working directory
-WORKDIR /app
+WORKDIR /usr/local/app
 
-# Copy the package.json and package-lock.json files
-COPY package*.json ./
+RUN echo ">>> Setting up the working directory"
+#COPY ./ /usr/local/app/
 
-# Install the dependencies
+# Copy package.json and install dependencies
+COPY package.json package-lock.json ./
+
 RUN npm install
 
-# Copy the rest of the application code
+# Copy the application files
 COPY . .
+RUN echo ">>> Copied application files"
 
-# Build the Angular application
-RUN npm run build --prod
+# Build the application
+RUN npm run build -- --project=web-pwa --configuration=production
 
-# Use the official Nginx image to serve the application
+# Stage 2: Serve the application using Nginx
 FROM nginx:alpine
 
-# Copy the built Angular application from the build stage
-COPY --from=build /app/dist/web-pwa /usr/share/nginx/html
+# Copy the build output to the Nginx HTML directory
+COPY --from=build-stage /usr/local/app/dist/web-pwa/browser /usr/share/nginx/html
+RUN echo ">>> Build output copied to Nginx HTML directory"
+
+# Copy custom Nginx configuration if needed
+#COPY nginx.conf /etc/nginx/nginx.conf
 
 # Expose port 80
 EXPOSE 80
 
-# Start Nginx server
+# Start Nginx
 CMD ["nginx", "-g", "daemon off;"]

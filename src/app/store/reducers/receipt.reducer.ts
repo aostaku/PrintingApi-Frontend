@@ -2,6 +2,7 @@ import { createReducer, on } from '@ngrx/store';
 import { Receipt } from '../../models/receiptDTO';
 import {
   getReceipt,
+  getReceiptOffline,
   getReceiptSuccess,
   submitReceipt,
   submitReceiptFailure,
@@ -46,6 +47,21 @@ export const receiptReducer = createReducer(
 export const getReceiptReducer = createReducer(
   receiptInitialState,
   on(getReceipt, (state) => ({ ...state, loading: true, error: null })),
+  on(getReceiptSuccess, (state, { receipt }) => ({
+    ...state,
+    receipt,
+    loading: false,
+  })),
+  on(submitReceiptFailure, (state, { error }) => ({
+    ...state,
+    loading: false,
+    error,
+  }))
+);
+
+export const getReceiptOfflineReducer = createReducer(
+  receiptInitialState,
+  on(getReceiptOffline, (state) => ({ ...state, loading: true, error: null })),
   on(getReceiptSuccess, (state, { receipt }) => ({
     ...state,
     receipt,

@@ -15,7 +15,11 @@ import { TableModule } from 'primeng/table';
 import { Subscription, tap } from 'rxjs';
 import { ReceiptsComponent } from './components/receipts/receipts.component';
 import { isDialogOpen } from './store/actions/modal.actions';
-import { getReceipt, printReceiptById } from './store/actions/receipt.action';
+import {
+  getReceipt,
+  getReceiptOffline,
+  printReceiptById,
+} from './store/actions/receipt.action';
 import {
   selectAllReceiptError,
   selectAllReceipts,
@@ -91,7 +95,9 @@ export class AppComponent {
     );
   }
 
-  getOfflineData = () => {};
+  getOfflineData = () => {
+    this.store.dispatch(getReceiptOffline({ pageIndex: 1, pageSize: 10 }));
+  };
 
   printReceipt(receiptId: string) {
     this.store.dispatch(printReceiptById({ id: receiptId }));

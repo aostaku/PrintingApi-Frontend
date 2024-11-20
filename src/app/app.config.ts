@@ -20,6 +20,7 @@ import { routes } from './app.routes';
 import { ReceiptEffects } from './store/effects/receipt.effect';
 import { modalReducer } from './store/reducers/modal.reducer';
 import {
+  getReceiptOfflineReducer,
   getReceiptReducer,
   receiptReducer,
 } from './store/reducers/receipt.reducer';
@@ -36,6 +37,7 @@ export const appConfig: ApplicationConfig = {
       modal: modalReducer,
       receipt: receiptReducer,
       getAllReceipts: getReceiptReducer,
+      getAllReceiptsOffline: getReceiptOfflineReducer,
     }),
     provideRouterStore(),
     provideEffects([ReceiptEffects]),
