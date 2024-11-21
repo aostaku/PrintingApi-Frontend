@@ -8,7 +8,6 @@ import { PageableCollection } from '../../models/PageableCollection';
 import { Receipt } from '../../models/receiptDTO';
 import {
   getReceipt,
-  getReceiptFailure,
   getReceiptOffline,
   getReceiptOfflineFailure,
   getReceiptOfflineSuccess,
@@ -44,7 +43,19 @@ export class ReceiptEffects {
             map((receipt: PageableCollection<Receipt>) =>
               getReceiptSuccess({ receipt: receipt.data })
             ),
-            catchError((error) => of(getReceiptFailure({ error })))
+            catchError((error) => {
+              console.error(
+                'Error fetching receipts from primary endpoint:',
+                error
+              );
+              // Dispatch the getReceiptOffline action to trigger the fallback
+              return of(
+                getReceiptOffline({
+                  pageIndex: action.pageIndex,
+                  pageSize: action.pageSize,
+                })
+              );
+            })
           )
       )
     )

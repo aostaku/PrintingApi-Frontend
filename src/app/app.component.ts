@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, effect, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ConnectionService, ConnectionState } from 'ng-connection-service';
@@ -12,11 +12,7 @@ import { Subscription } from 'rxjs';
 import { AppSettings } from './app.settings';
 import { ReceiptsComponent } from './components/receipts/receipts.component';
 import { isDialogOpen } from './store/actions/modal.actions';
-import {
-  getReceipt,
-  getReceiptOffline,
-  printReceiptById,
-} from './store/actions/receipt.action';
+import { getReceipt, printReceiptById } from './store/actions/receipt.action';
 import {
   selectAllReceiptError,
   selectAllReceipts,
@@ -53,21 +49,6 @@ export class AppComponent {
 
   pageIndex = 1;
   pageSize = 10;
-
-  constructor() {
-    effect(() => {
-      if (this.errorAllReceipts()) {
-        console.log('Service is offline, or the data can not be fetched.');
-
-        this.store.dispatch(
-          getReceiptOffline({
-            pageIndex: this.pageIndex,
-            pageSize: this.pageSize,
-          })
-        );
-      }
-    });
-  }
 
   ngOnInit() {
     this.store.dispatch(
