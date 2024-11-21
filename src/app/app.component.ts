@@ -12,7 +12,7 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TableModule } from 'primeng/table';
-import { catchError, of, Subscription, tap } from 'rxjs';
+import { catchError, of, Subscription, tap, timeout } from 'rxjs';
 import { AppSettings } from './app.settings';
 import { ReceiptsComponent } from './components/receipts/receipts.component';
 import { isDialogOpen } from './store/actions/modal.actions';
@@ -60,17 +60,17 @@ export class AppComponent {
 
   constructor() {
     effect(() => {
-      if (this.status === 'ONLINE') {
-        console.log('Online data was triggered');
+      // if (this.status === 'ONLINE') {
+      //   console.log('Online data was triggered');
 
-        this.store.dispatch(
-          getReceipt({ pageIndex: this.pageIndex, pageSize: this.pageSize })
-        );
-      } else if (this.status === 'OFFLINE') {
-        console.log('Offline data was triggered');
+      //   this.store.dispatch(
+      //     getReceipt({ pageIndex: this.pageIndex, pageSize: this.pageSize })
+      //   );
+      // } else if (this.status === 'OFFLINE') {
+      //   console.log('Offline data was triggered');
 
-        this.store.dispatch(getReceiptOffline({ pageIndex: 1, pageSize: 10 }));
-      }
+      //   this.store.dispatch(getReceiptOffline({ pageIndex: 1, pageSize: 10 }));
+      // }
       console.log('Status:', this.status);
       console.log('If status:', this.status === 'ONLINE');
     });
@@ -86,10 +86,14 @@ export class AppComponent {
       this.connectionService
         .monitor(options)
         .pipe(
+          timeout(5000),
           tap((newState: ConnectionState) => {
             this.currentState = newState;
 
-            if (this.currentState.hasNetworkConnection) {
+            if (
+              this.currentState.hasNetworkConnection &&
+              this.currentState.hasInternetAccess
+            ) {
               this.status = 'ONLINE';
             } else {
               this.status = 'OFFLINE';
@@ -101,7 +105,21 @@ export class AppComponent {
             return of(null); // Return a null observable to continue the stream
           })
         )
-        .subscribe()
+        .subscribe(() => {
+          if (this.status === 'ONLINE') {
+            console.log('Online data was triggered');
+            this.store.dispatch(
+              getReceipt({ pageIndex: this.pageIndex, pageSize: this.pageSize })
+            );
+          } else if (this.status === 'OFFLINE') {
+            console.log('Offline data was triggered');
+            this.store.dispatch(
+              getReceiptOffline({ pageIndex: 1, pageSize: 10 })
+            );
+          }
+          console.log('Status:', this.status);
+          console.log('If status:', this.status === 'ONLINE');
+        })
     );
   }
 
