@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, effect, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
 import {
@@ -58,59 +58,54 @@ export class AppComponent {
   pageIndex = 1;
   pageSize = 10;
 
-  constructor() {
-    effect(() => {
-      // if (this.status === 'ONLINE') {
-      //   console.log('Online data was triggered');
-
-      //   this.store.dispatch(
-      //     getReceipt({ pageIndex: this.pageIndex, pageSize: this.pageSize })
-      //   );
-      // } else if (this.status === 'OFFLINE') {
-      //   console.log('Offline data was triggered');
-
-      //   this.store.dispatch(getReceiptOffline({ pageIndex: 1, pageSize: 10 }));
-      // }
-      console.log('Status:', this.status);
-      console.log('If status:', this.status === 'ONLINE');
-    });
-  }
-
   ngOnInit() {
     const options: ConnectionServiceOptions = {
       enableHeartbeat: true,
       heartbeatUrl: `${this.apiUrl}/api/invoice/heartbeat`,
-      heartbeatInterval: 50000,
+      heartbeatInterval: 20000,
     };
+
     this.subscription.add(
       this.connectionService
         .monitor(options)
         .pipe(
-          timeout(5000),
+          timeout(15000),
           tap((newState: ConnectionState) => {
             this.currentState = newState;
+            console.log('Current state:', this.currentState);
 
-            if (this.currentState.hasInternetAccess) {
-              this.store.dispatch(
-                getReceipt({
-                  pageIndex: this.pageIndex,
-                  pageSize: this.pageSize,
-                })
-              );
+            if (
+              this.currentState.hasNetworkConnection &&
+              this.currentState.hasInternetAccess
+            ) {
+              this.status = 'ONLINE';
             } else {
-              this.store.dispatch(
-                getReceiptOffline({ pageIndex: 1, pageSize: 10 })
-              );
+              this.status = 'OFFLINE';
             }
             console.log('Status set to:', this.status);
           }),
           catchError((error) => {
-            console.log('Heartbeat error:', error);
+            console.error('Heartbeat error:', error);
             this.status = 'OFFLINE';
             return of(null); // Return a null observable to continue the stream
           })
         )
-        .subscribe()
+        .subscribe(() => {
+          console.log('Subscription triggered with status:', this.status);
+          if (this.status === 'ONLINE') {
+            console.log('Online data was triggered');
+            this.store.dispatch(
+              getReceipt({ pageIndex: this.pageIndex, pageSize: this.pageSize })
+            );
+          } else if (this.status === 'OFFLINE') {
+            console.log('Offline data was triggered');
+            this.store.dispatch(
+              getReceiptOffline({ pageIndex: 1, pageSize: 10 })
+            );
+          }
+          console.log('Status:', this.status);
+          console.log('If status:', this.status === 'ONLINE');
+        })
     );
   }
 
