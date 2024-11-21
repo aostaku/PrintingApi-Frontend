@@ -13,6 +13,7 @@ import { CardModule } from 'primeng/card';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TableModule } from 'primeng/table';
 import { Subscription, tap } from 'rxjs';
+import { AppSettings } from './app.settings';
 import { ReceiptsComponent } from './components/receipts/receipts.component';
 import { isDialogOpen } from './store/actions/modal.actions';
 import {
@@ -42,6 +43,7 @@ import {
   styleUrl: './app.component.scss',
 })
 export class AppComponent {
+  apiUrl = AppSettings.localServerUrl;
   http = inject(HttpClient);
   store = inject(Store);
   status!: string;
@@ -76,9 +78,9 @@ export class AppComponent {
 
   ngOnInit() {
     const options: ConnectionServiceOptions = {
-      enableHeartbeat: false,
-      heartbeatUrl: 'http://localhost:5068/hartbeat',
-      heartbeatInterval: 200000,
+      enableHeartbeat: true,
+      heartbeatUrl: `${this.apiUrl}/api/heartbeat`,
+      heartbeatInterval: 20000,
     };
     this.subscription.add(
       this.connectionService
