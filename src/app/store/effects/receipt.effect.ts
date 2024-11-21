@@ -61,7 +61,7 @@ export class ReceiptEffects {
                 )
                 .pipe(
                   map((receipt: PageableCollection<Receipt>) =>
-                    getReceiptOfflineSuccess({ receipt: receipt.data })
+                    getReceiptSuccess({ receipt: receipt.data })
                   ),
                   catchError((error) => {
                     console.error(
