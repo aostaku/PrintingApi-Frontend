@@ -90,17 +90,15 @@ export class AppComponent {
           tap((newState: ConnectionState) => {
             this.currentState = newState;
 
-            if (
-              this.currentState.hasNetworkConnection &&
-              this.currentState.hasInternetAccess
-            ) {
+            if (this.currentState.hasInternetAccess) {
               this.status = 'ONLINE';
             } else {
               this.status = 'OFFLINE';
             }
+            console.log('Status set to:', this.status);
           }),
           catchError((error) => {
-            console.error('Heartbeat error:', error);
+            console.log('Heartbeat error:', error);
             this.status = 'OFFLINE';
             return of(null); // Return a null observable to continue the stream
           })
