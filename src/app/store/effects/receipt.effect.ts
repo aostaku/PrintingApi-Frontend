@@ -49,12 +49,28 @@ export class ReceiptEffects {
                 error
               );
               // Dispatch the getReceiptOffline action to trigger the fallback
-              return of(
-                getReceiptOffline({
-                  pageIndex: action.pageIndex,
-                  pageSize: action.pageSize,
-                })
-              );
+              return this.http
+                .get<PageableCollection<Receipt>>(
+                  `${this.offlineUrl}/api/invoice`,
+                  {
+                    params: {
+                      pageIndex: action.pageIndex.toString(),
+                      pageSize: action.pageSize.toString(),
+                    },
+                  }
+                )
+                .pipe(
+                  map((receipt: PageableCollection<Receipt>) =>
+                    getReceiptOfflineSuccess({ receipt: receipt.data })
+                  ),
+                  catchError((error) => {
+                    console.error(
+                      'Error fetching receipts from offline endpoint:',
+                      error
+                    );
+                    return of(getReceiptOfflineFailure({ error }));
+                  })
+                );
             })
           )
       )
