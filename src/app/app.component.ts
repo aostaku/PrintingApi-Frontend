@@ -80,7 +80,7 @@ export class AppComponent {
     const options: ConnectionServiceOptions = {
       enableHeartbeat: true,
       heartbeatUrl: `${this.apiUrl}/api/invoice/heartbeat`,
-      heartbeatInterval: 20000,
+      heartbeatInterval: 50000,
     };
     this.subscription.add(
       this.connectionService
@@ -91,9 +91,16 @@ export class AppComponent {
             this.currentState = newState;
 
             if (this.currentState.hasInternetAccess) {
-              this.status = 'ONLINE';
+              this.store.dispatch(
+                getReceipt({
+                  pageIndex: this.pageIndex,
+                  pageSize: this.pageSize,
+                })
+              );
             } else {
-              this.status = 'OFFLINE';
+              this.store.dispatch(
+                getReceiptOffline({ pageIndex: 1, pageSize: 10 })
+              );
             }
             console.log('Status set to:', this.status);
           }),
@@ -103,21 +110,7 @@ export class AppComponent {
             return of(null); // Return a null observable to continue the stream
           })
         )
-        .subscribe(() => {
-          if (this.status === 'ONLINE') {
-            console.log('Online data was triggered');
-            this.store.dispatch(
-              getReceipt({ pageIndex: this.pageIndex, pageSize: this.pageSize })
-            );
-          } else if (this.status === 'OFFLINE') {
-            console.log('Offline data was triggered');
-            this.store.dispatch(
-              getReceiptOffline({ pageIndex: 1, pageSize: 10 })
-            );
-          }
-          console.log('Status:', this.status);
-          console.log('If status:', this.status === 'ONLINE');
-        })
+        .subscribe()
     );
   }
 
