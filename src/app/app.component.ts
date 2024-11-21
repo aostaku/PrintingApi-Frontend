@@ -12,7 +12,7 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TableModule } from 'primeng/table';
-import { Subscription, tap } from 'rxjs';
+import { catchError, of, Subscription, tap } from 'rxjs';
 import { AppSettings } from './app.settings';
 import { ReceiptsComponent } from './components/receipts/receipts.component';
 import { isDialogOpen } from './store/actions/modal.actions';
@@ -79,7 +79,7 @@ export class AppComponent {
   ngOnInit() {
     const options: ConnectionServiceOptions = {
       enableHeartbeat: true,
-      heartbeatUrl: `${this.apiUrl}/api/heartbeat`,
+      heartbeatUrl: `${this.apiUrl}/api/invoice/heartbeat`,
       heartbeatInterval: 20000,
     };
     this.subscription.add(
@@ -94,6 +94,11 @@ export class AppComponent {
             } else {
               this.status = 'OFFLINE';
             }
+          }),
+          catchError((error) => {
+            console.error('Heartbeat error:', error);
+            this.status = 'OFFLINE';
+            return of(null); // Return a null observable to continue the stream
           })
         )
         .subscribe()
