@@ -1,18 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, inject } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
-import {
-  ConnectionService,
-  ConnectionServiceOptions,
-  ConnectionState,
-} from 'ng-connection-service';
+import { ConnectionService, ConnectionState } from 'ng-connection-service';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TableModule } from 'primeng/table';
-import { catchError, of, Subscription, tap, timeout } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { AppSettings } from './app.settings';
 import { ReceiptsComponent } from './components/receipts/receipts.component';
 import { isDialogOpen } from './store/actions/modal.actions';
@@ -58,54 +54,24 @@ export class AppComponent {
   pageIndex = 1;
   pageSize = 10;
 
-  ngOnInit() {
-    const options: ConnectionServiceOptions = {
-      enableHeartbeat: true,
-      heartbeatUrl: `${this.apiUrl}/api/invoice/heartbeat`,
-      heartbeatInterval: 20000,
-    };
+  constructor() {
+    effect(() => {
+      if (this.errorAllReceipts()) {
+        console.log('Service is offline, or the data can not be fetched.');
 
-    this.subscription.add(
-      this.connectionService
-        .monitor(options)
-        .pipe(
-          timeout(15000),
-          tap((newState: ConnectionState) => {
-            this.currentState = newState;
-            console.log('Current state:', this.currentState);
-
-            if (
-              this.currentState.hasNetworkConnection &&
-              this.currentState.hasInternetAccess
-            ) {
-              this.status = 'ONLINE';
-            } else {
-              this.status = 'OFFLINE';
-            }
-            console.log('Status set to:', this.status);
-          }),
-          catchError((error) => {
-            console.error('Heartbeat error:', error);
-            this.status = 'OFFLINE';
-            return of(null); // Return a null observable to continue the stream
+        this.store.dispatch(
+          getReceiptOffline({
+            pageIndex: this.pageIndex,
+            pageSize: this.pageSize,
           })
-        )
-        .subscribe(() => {
-          console.log('Subscription triggered with status:', this.status);
-          if (this.status === 'ONLINE') {
-            console.log('Online data was triggered');
-            this.store.dispatch(
-              getReceipt({ pageIndex: this.pageIndex, pageSize: this.pageSize })
-            );
-          } else if (this.status === 'OFFLINE') {
-            console.log('Offline data was triggered');
-            this.store.dispatch(
-              getReceiptOffline({ pageIndex: 1, pageSize: 10 })
-            );
-          }
-          console.log('Status:', this.status);
-          console.log('If status:', this.status === 'ONLINE');
-        })
+        );
+      }
+    });
+  }
+
+  ngOnInit() {
+    this.store.dispatch(
+      getReceipt({ pageIndex: this.pageIndex, pageSize: this.pageSize })
     );
   }
 
