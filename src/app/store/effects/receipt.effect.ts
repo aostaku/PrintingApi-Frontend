@@ -118,7 +118,25 @@ export class ReceiptEffects {
       mergeMap(({ id }) =>
         this.http.post(`${this.apiUrl}/api/invoice/print/${id}`, null).pipe(
           map(() => printReceiptByIdSuccess()),
-          catchError((error) => of(printReceiptFailure({ error })))
+          catchError((error) => {
+            console.error(
+              'Error fetching receipts from primary endpoint:',
+              error
+            );
+            // Dispatch the getReceiptOffline action to trigger the fallback
+            return this.http
+              .post(`${this.offlineUrl}/api/invoice/print/${id}`, null)
+              .pipe(
+                map(() => printReceiptByIdSuccess()),
+                catchError((error) => {
+                  console.error(
+                    'Error fetching receipts from offline endpoint:',
+                    error
+                  );
+                  return of(printReceiptFailure({ error }));
+                })
+              );
+          })
         )
       )
     )
